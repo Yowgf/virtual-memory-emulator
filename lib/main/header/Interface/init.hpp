@@ -27,8 +27,6 @@ typedef struct {
   Alg::emulator* chosenEmulator;
 } inputT;
 
-typedef std::chrono::duration<double> clockT;
-
 class init {
   
 public:

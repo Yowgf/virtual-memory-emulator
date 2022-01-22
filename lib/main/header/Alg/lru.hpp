@@ -13,7 +13,7 @@ namespace Alg {
 
 struct lruPageCompare {
   bool operator()(const Memory::pageT& p1, const Memory::pageT& p2) const {
-    return p1.lastUsedAt > p2.lastUsedAt;
+    return p1.lastUsedAt >= p2.lastUsedAt;
   }
 };
 

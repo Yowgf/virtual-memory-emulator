@@ -21,6 +21,8 @@
 #define TIME_EXECUTION(clkVar, expr) (expr);
 #endif
 
+typedef std::chrono::duration<double> clockT;
+
 namespace Utils {
 
 class time {

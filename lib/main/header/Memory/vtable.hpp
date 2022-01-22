@@ -8,6 +8,7 @@
 #define MEMORY_VTABLE_H
 
 #include "Utils/defs.hpp"
+#include "Utils/time.hpp"
 
 #include <boost/heap/fibonacci_heap.hpp>
 
@@ -23,7 +24,7 @@ typedef struct {
   unsigned startAddr;
   // TODO: make the metrics a union, once I have a better notion of how that
   // should work.
-  unsigned lastUsedAt;
+  long int lastUsedAt;
 } pageT;
 
 typedef struct {
@@ -56,7 +57,8 @@ public:
 
   vtableOpRespT read(unsigned address)
   {
-    BOOST_LOG_TRIVIAL(debug) << "(vtable) performing page read. (address=" << address << ")";
+    BOOST_LOG_TRIVIAL(debug) << "(vtable) performing page read. (address="
+			     << address << ")";
     auto pageId = pageidFromAddr(address);
     return vtableOpRespT{.wasPageFound = status[pageId].active};
   }
@@ -73,23 +75,23 @@ public:
     return pages.size() * KB >= memsz;
   }
 
-  bool replaceTopPage()
+  bool replaceTopPage(unsigned address)
   {
-    auto pageId = pages.top().id;
-    auto& pageStatus = status[pageId];
-    bool ret = pageStatus.dirty;
-
-    pageStatus.dirty = false;
-    pages.pop();
-    pages.push({.id = pageId, .lastUsedAt = 0});
-
-    return ret;
+    bool wasDirty = removeTopPage();
+    insertNewPage(pageidFromAddr(address));
+    return wasDirty;
   }
 
   void insertNewPage(unsigned address) {
+    using namespace std::chrono;
     auto pageId = pageidFromAddr(address);
-    pages.push(pageT{.id = pageId, .lastUsedAt = 0});
-    status[pageId] = pageStatusT{.active = true, .dirty = false};
+    auto currentTime = time_point_cast<nanoseconds>(high_resolution_clock::now()).time_since_epoch().count();
+    BOOST_LOG_TRIVIAL(debug) << "(vtable) inserting new page (address="
+			     << address << " pageid=" << pageId
+			     << " currentTime=" << currentTime << ")";
+    pages.push(pageT{.id = pageId, .lastUsedAt = currentTime});
+    status[pageId].active = true;
+    status[pageId].dirty = false;
   }
 
 private:
@@ -109,6 +111,16 @@ private:
       pageSize >>= 1;
     }
     return lowestBits;
+  }
+
+  bool removeTopPage()
+  {
+    unsigned topPageId = pages.top().id;
+    pages.pop();
+    bool isDirty = status[topPageId].dirty;
+    status[topPageId].active = false;
+    status[topPageId].dirty = false;
+    return isDirty;
   }
 
   unsigned pageidFromAddr(unsigned address)

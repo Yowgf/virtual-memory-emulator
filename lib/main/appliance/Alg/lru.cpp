@@ -29,7 +29,7 @@ void lru::processRead(unsigned address)
   if (!resp.wasPageFound) {
     stats.numPageFaults++;
     if (vtable.full()) {
-      bool wasDirty = vtable.replaceTopPage();
+      bool wasDirty = vtable.replaceTopPage(address);
       if (wasDirty) {
 	stats.numPageWrites++;
       }
@@ -46,7 +46,7 @@ void lru::processWrite(unsigned address)
     stats.numPageFaults++;
     if (vtable.full()) {
       BOOST_LOG_TRIVIAL(debug) << "vtable is full";
-      bool wasDirty = vtable.replaceTopPage();
+      bool wasDirty = vtable.replaceTopPage(address);
       if (wasDirty) {
 	stats.numPageWrites++;
       }
