@@ -14,10 +14,10 @@ APPLIANCE_MAIN_FILES := $(wildcard $(patsubst %, $(APPLIANCE_MAIN)/%/*.$(APP_EXT
 OBJECT_MAIN_FILES := $(patsubst $(APPLIANCE_MAIN)%$(APP_EXTENSION), $(BUILD_MAIN)%$(OBJECT_EXTENSION), $(APPLIANCE_MAIN_FILES))
 
 # Compilation code for each object file
-COMPIL_OBJECT_CODE_MAIN = $(CXX) $(FLAGS) -I $(HEADER_MAIN) -c $< -o $@
+COMPIL_OBJECT_CODE_MAIN = $(CXX) $(FLAGS) -DBOOST_LOG_DYN_LINK -I $(HEADER_MAIN) -c $< -o $@
 
 # Linking code
-LINK_CODE = $(CXX) $(FLAGS) -I $(HEADER_MAIN) $(OBJECT_MAIN_FILES) $(MAIN_FILE) -o $@
+LINK_CODE = $(CXX) $(FLAGS) -I $(HEADER_MAIN) $(OBJECT_MAIN_FILES) $(MAIN_FILE) -lboost_log -lpthread -o $@
 
 BUILD_MODS_MAIN := $(patsubst %, $(BUILD_MAIN)/%, $(MODULES))
 

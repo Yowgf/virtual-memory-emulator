@@ -14,19 +14,17 @@
 
 namespace Alg {
 
-void emulator::configure(int pageSize, int memorySize, std::string filePath)
+void emulator::configure(std::string filePath)
 {
-  this->pageSize = pageSize;
-  this->memorySize = memorySize;
   decodeFile(filePath);
 }
 
 void emulator::decodeFile(std::string filePath)
 {
   auto file = std::ifstream{filePath, std::ifstream::in};
-  int i = 0;
+  unsigned i = 0;
   while (file.good()) {
-    auto op = memop{};
+    auto op = memopT{};
     file >> std::hex >> op.address >> op.type;
     memops.push_back(op);
     i++;
@@ -39,6 +37,23 @@ void emulator::decodeFile(std::string filePath)
 	    file.good(), file.eof(), file.fail(), file.bad());
     throw std::runtime_error(buffer);
   }
+}
+
+void emulator::processOperations(memopsT& memops)
+{
+  for (auto it = memops.begin(); it != memops.end(); it++) {
+    if (it->type == READ_OP) {
+      processRead(it->address);
+    } else {
+      processWrite(it->address);
+    }
+  }
+}
+
+void emulator::logStats()
+{
+  std::cout << "Page faults: " << stats.numPageFaults << "\n";
+  std::cout << "Page writebacks: " << stats.numPageWrites << "\n";
 }
 
 }

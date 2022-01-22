@@ -7,7 +7,7 @@
 
 # Compiler command and flags
 CXX   := 
-FLAGS := 
+FLAGS := -std=c++14 -Wall
 
 # Source directory
 SOURCE := lib
@@ -16,7 +16,7 @@ SOURCE := lib
 BUILD := build
 
 # Project's modules
-MODULES := Alg Interface Utils
+MODULES := Alg Interface Memory Utils
 
 # Files extensions
 HEADER_EXTENSION     := 

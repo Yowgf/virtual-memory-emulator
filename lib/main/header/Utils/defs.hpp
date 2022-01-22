@@ -7,11 +7,16 @@
 #ifndef DEFS_H
 #define DEFS_H
 
-#define MEASURE_TIME // Activate time measuring
+// Global types
 
-// Types used in the algorithm
+// Debugging control macros
+#define PRINT_EXECUTION_TIME
 
-// Put here any debugging control macros
+// Global variables
+#include <boost/log/core.hpp>
+#include <boost/log/trivial.hpp>
+#include <boost/log/expressions.hpp>
 
+#define LOG_LEVEL boost::log::trivial::info
 
 #endif // #ifndef DEFS_H

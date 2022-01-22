@@ -13,7 +13,10 @@ namespace Alg {
 
 class fifo : public emulator {
 public:
+  fifo(unsigned pageSize, unsigned memorySize, std::string filePath);
   virtual void run();
+  virtual void processRead(unsigned address);
+  virtual void processWrite(unsigned address);
 };
 
 }

@@ -9,10 +9,11 @@
 #include "Alg/fifo.hpp"
 #include "Alg/newalg.hpp"
 #include "Interface/init.hpp"
+#include "Utils/defs.hpp"
 #include "Utils/file.hpp"
 #include "Utils/error.hpp"
 
-#include <bits/stdc++.h>
+#include <cstdlib>
 #include <iomanip>
 #include <iostream>
 #include <string>
@@ -20,6 +21,7 @@
 #define INRANGE(n, a, b) (a <= n && n <= b)
 
 using namespace Utils;
+namespace logger = boost::log;
 
 namespace Interface {
   
@@ -32,12 +34,16 @@ init::init(int argc, char** argv)
                                    " <input-file> <page-size> <memory-size>"};
   }
 
-  Alg::emulator* chosenAlg = processEntries(argc, argv);
-
   try {
-    timeRunAlg(*chosenAlg);
+    initLogger();
+    userInput = processEntries(argc, argv);
+    printHeader();
+    auto executionTime = timeRunAlg(this->userInput.chosenEmulator);
+    printFooter(executionTime);
   }
   catch(std::exception&) {
+    // TODO: remove this memory leak
+    free(this->userInput.chosenEmulator);
     destroy();
     throw;
   }
@@ -51,13 +57,19 @@ init::~init()
 void init::destroy()
 {}
 
-void init::timeRunAlg(Alg::emulator& alg)
+void init::initLogger()
+{
+    logger::core::get()->set_filter
+    (
+        logger::trivial::severity >= LOG_LEVEL
+    );
+}
+
+clockT init::timeRunAlg(Alg::emulator* alg)
 {
   auto before = std::chrono::high_resolution_clock::now();
-  alg.run();
-  auto executionTime = std::chrono::high_resolution_clock::now() - before;
-
-  printOutput(alg, executionTime);
+  alg->run();
+  return std::chrono::high_resolution_clock::now() - before;
 }
 
 bool init::validateArguments(int argc, char** argv) const noexcept
@@ -86,39 +98,60 @@ bool init::validateArguments(int argc, char** argv) const noexcept
   return true;
 }
 
-Alg::emulator* init::processEntries(int argc, char** argv)
+inputT init::processEntries(int argc, char** argv)
 {
-  auto emulatorStr = std::string(argv[1]);
-  auto filePath = std::string(argv[2]);
-  int pageSize = 0;
-  int memorySize = 0;
+  std::string emulatorStr{argv[1]};
+  std::string filePath{argv[2]};
+  unsigned pageSize = 0;
+  unsigned memorySize = 0;
 
   std::stringstream ss;
-  ss << argv[3]; ss >> pageSize;
-  ss << argv[4]; ss >> memorySize;
+  ss << argv[3]; ss >> pageSize; ss.clear();
+  ss << argv[4]; ss >> memorySize; ss.clear();
+  
+  auto* emulator = chooseAlg(emulatorStr, pageSize, memorySize, filePath);
 
-  auto emulator = chooseAlg(emulatorStr);
-  emulator->configure(pageSize, memorySize, filePath);
-
-  return emulator;
+  return inputT{emulatorStr, filePath, pageSize, memorySize, emulator};
 }
 
-Alg::emulator* init::chooseAlg(std::string emulatorStr)
+Alg::emulator* init::chooseAlg
+  (std::string emulatorStr,
+   unsigned pageSize,
+   unsigned memorySize,
+   std::string filePath)
 {
   if (emulatorStr == "lru") {
-    return new Alg::lru;
+    return new Alg::lru(pageSize, memorySize, filePath);
   } else if (emulatorStr == "fifo") {
-    return new Alg::fifo;
+    return new Alg::fifo(pageSize, memorySize, filePath);
   } else if (emulatorStr == "newalg") {
-    return new Alg::newalg;
+    return new Alg::newalg(pageSize, memorySize, filePath);
   } else {
     throw std::runtime_error(std::string("Invalid emulator ") + emulatorStr);
   }
 }
 
-void init::printOutput(Alg::emulator& alg, clockT executionTime)
+void init::printHeader()
 {
-  std::cout << "(TODO) example output of emulator" << std::endl;
+  std::cout << "Running the emulator...\n";
+  std::cout << "Input file: " << userInput.filePath << "\n";
+  std::cout << "Memory size: " << userInput.memorySize << "\n";
+  std::cout << "Page size: " << userInput.pageSize << "\n";
+  std::cout << "Page replacement strategy: " << userInput.chosenEmulatorStr << "\n";
+}
+
+void init::printFooter(clockT executionTime)
+{
+  userInput.chosenEmulator->logStats();
+#ifdef PRINT_EXECUTION_TIME
+  printExecTime(executionTime);
+#endif
+}
+
+void init::printExecTime(clockT executionTime)
+{
+  double clkCount = executionTime.count();
+  std::cout << "Execution time (seconds): " << std::setprecision(6) << std::fixed << clkCount << "\n";
 }
 
 }

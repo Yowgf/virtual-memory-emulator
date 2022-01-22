@@ -8,10 +8,10 @@
 # Links objects. Put first to avoid errors with .DEFAULT_GOAL assignment.
 $(TARGET) : $(TARGET_DEPENDENCIES)
 	$(info Linking main...)
-	@$(LINK_CODE)
+	$(LINK_CODE)
 	$(info Done.)
 
 # Compiles objects.
 $(BUILD_MAIN)/%$(OBJECT_EXTENSION) :: $(APPLIANCE_MAIN)/%$(APP_EXTENSION) $(HEADER_MAIN)/%$(HEADER_EXTENSION)
 	$(info $@)
-	@$(COMPIL_OBJECT_CODE_MAIN)
+	$(COMPIL_OBJECT_CODE_MAIN)

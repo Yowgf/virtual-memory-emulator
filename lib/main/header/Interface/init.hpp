@@ -18,7 +18,16 @@
 
 namespace Interface {
 
-typedef std::chrono::duration<long int, std::ratio<1, 1000000000>> clockT;
+typedef struct {
+  std::string chosenEmulatorStr;
+  std::string filePath;
+  unsigned pageSize;
+  unsigned memorySize;
+  
+  Alg::emulator* chosenEmulator;
+} inputT;
+
+typedef std::chrono::duration<double> clockT;
 
 class init {
   
@@ -33,14 +42,24 @@ private:
   static constexpr unsigned maxFileNameLen = 0x100;
   const std::vector<std::string> allowedEmulators{"lru", "fifo", "newalg"};
 
+  inputT userInput;
+
   void destroy();
 
-  Alg::emulator* processEntries(int argc, char** argv);
-  Alg::emulator* chooseAlg(std::string emulatorStr);
+  void initLogger();
+
+  inputT processEntries(int argc, char** argv);
+  Alg::emulator* chooseAlg
+    (std::string emulatorStr,
+     unsigned pageSize,
+     unsigned memorySize,
+     std::string filePath);
   bool validateArguments(int argc, char** argv) const noexcept;
 
-  void timeRunAlg(Alg::emulator& alg);
-  void printOutput(Alg::emulator& alg, clockT executionTime);
+  clockT timeRunAlg(Alg::emulator* alg);
+  void printHeader();
+  void printFooter(clockT executionTime);
+  void printExecTime(clockT executionTime);
 };
 
 }
