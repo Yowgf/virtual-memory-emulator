@@ -7,11 +7,11 @@
 #ifndef ALG_NEWALG_H
 #define ALG_NEWALG_H
 
-#include "Alg/algorithm.hpp"
+#include "Alg/emulator.hpp"
 
 namespace Alg {
 
-class newalg : public algorithm {
+class newalg : public emulator {
 public:
   virtual void run();
 };

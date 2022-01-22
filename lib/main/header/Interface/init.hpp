@@ -10,7 +10,7 @@
 #ifndef INIT_H
 #define INIT_H
 
-#include "Alg/algorithm.hpp"
+#include "Alg/emulator.hpp"
 #include "Utils/time.hpp"
 
 #include <string>
@@ -27,19 +27,20 @@ public:
   ~init();
 
 private:
+  // Constraints
   static constexpr int minArgcAllowed = 5;
   static constexpr int maxArgcAllowed = 5;
   static constexpr unsigned maxFileNameLen = 0x100;
-  const std::vector<std::string> allowedAlgorithms{"lru", "fifo", "newalg"};
+  const std::vector<std::string> allowedEmulators{"lru", "fifo", "newalg"};
 
   void destroy();
 
-  Alg::algorithm* processEntries(int argc, char** argv);
-  Alg::algorithm* chooseAlg(std::string algorithmStr);
+  Alg::emulator* processEntries(int argc, char** argv);
+  Alg::emulator* chooseAlg(std::string emulatorStr);
   bool validateArguments(int argc, char** argv) const noexcept;
 
-  void timeRunAlg(Alg::algorithm& alg);
-  void printOutput(Alg::algorithm& alg, clockT executionTime);
+  void timeRunAlg(Alg::emulator& alg);
+  void printOutput(Alg::emulator& alg, clockT executionTime);
 };
 
 }

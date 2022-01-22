@@ -7,11 +7,11 @@
 #ifndef ALG_FIFO_H
 #define ALG_FIFO_H
 
-#include "Alg/algorithm.hpp"
+#include "Alg/emulator.hpp"
 
 namespace Alg {
 
-class fifo : public algorithm {
+class fifo : public emulator {
 public:
   virtual void run();
 };

@@ -7,11 +7,11 @@
 #ifndef ALG_LRU_H
 #define ALG_LRU_H
 
-#include "Alg/algorithm.hpp"
+#include "Alg/emulator.hpp"
 
 namespace Alg {
 
-class lru : public algorithm {
+class lru : public emulator {
 public:
   virtual void run();
 };

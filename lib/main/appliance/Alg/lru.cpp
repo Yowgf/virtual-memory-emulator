@@ -10,6 +10,12 @@
 namespace Alg {
 
 void lru::run()
-{}
+{
+  // I need Pages
+
+  // Pages virtualize physical memory
+
+  // Each page has a size, a marker of 
+}
 
 }

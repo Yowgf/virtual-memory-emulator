@@ -8,8 +8,7 @@
 #ifndef ALG_H
 #define ALG_H
 
-// This is the general algorithm interface
-#include "Alg/algorithm.hpp"
+#include "Alg/emulator.hpp"
 
 #include "Alg/lru.hpp"
 #include "Alg/fifo.hpp"
