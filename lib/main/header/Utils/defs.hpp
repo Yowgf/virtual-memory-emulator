@@ -7,6 +7,9 @@
 #ifndef DEFS_H
 #define DEFS_H
 
+// Compilation flags
+#define BOOST_ALL_DYN_LINK
+
 // Global types
 
 // Debugging control macros

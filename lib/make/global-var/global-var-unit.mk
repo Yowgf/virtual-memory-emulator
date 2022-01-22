@@ -10,7 +10,7 @@ HEADER_UNIT    :=
 APPLIANCE_UNIT :=
 
 
-BUILD_UNIT := 
+BUILD_UNIT := build
 
-UNIT_MAIN_FILE := 
-UNIT_TARGET    := 
+UNIT_MAIN_FILE := test/main.cpp
+UNIT_TARGET    := build/main_test.out

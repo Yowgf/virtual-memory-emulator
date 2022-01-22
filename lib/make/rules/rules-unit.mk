@@ -6,13 +6,13 @@
 
 $(BUILD_UNIT)/%$(OBJECT_EXTENSION) :: $(APPLIANCE_UNIT)/%$(APP_EXTENSION) $(HEADER_UNIT)/%$(HEADER_EXTENSION)
 	$(info $@)
-	@$(COMPIL_OBJECT_CODE_UNIT)
+	$(COMPIL_OBJECT_CODE_UNIT)
 
 # Performs the various unit tests available
 unitTest :: $(UNIT_TARGET_DEPENDENCIES)
 	@echo Linking unit...
-	@$(UNIT_LINK_CODE)
+	$(UNIT_LINK_CODE)
 	@echo Done.
 	@echo Running unit tests...
-	@./$(UNIT_TARGET)
+	./$(UNIT_TARGET)
 	@echo Unit tests all done.
