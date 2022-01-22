@@ -16,7 +16,7 @@ SOURCE := lib
 BUILD := build
 
 # Project's modules
-MODULES := Interface
+MODULES := Alg Interface Utils
 
 # Files extensions
 HEADER_EXTENSION     := 
