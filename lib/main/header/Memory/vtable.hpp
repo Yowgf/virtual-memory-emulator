@@ -21,7 +21,6 @@ constexpr unsigned KB = 1024;
 
 typedef struct {
   unsigned id;
-  unsigned startAddr;
   // TODO: make the metrics a union, once I have a better notion of how that
   // should work.
   long int lastUsedAt;
@@ -43,7 +42,7 @@ typedef boost::heap::fibonacci_heap<pageT, boost::heap::compare<compare>> pagesT
 
 public:
   vtable(unsigned pageSize, unsigned memorySize) :
-    pagesz(pageSize*KB), memsz(memorySize*KB)
+    pagesz(pageSize), memsz(memorySize)
   {
     BOOST_LOG_TRIVIAL(info) << "(vtable) initializing vtable (pageSize="
 			    << pageSize << " memorySize=" << memorySize << ")";
@@ -57,7 +56,7 @@ public:
 
   vtableOpRespT read(unsigned address)
   {
-    BOOST_LOG_TRIVIAL(debug) << "(vtable) performing page read. (address="
+    BOOST_LOG_TRIVIAL(debug) << "(vtable) performing memory read. (address="
 			     << address << ")";
     auto pageId = pageidFromAddr(address);
     return vtableOpRespT{.wasPageFound = status[pageId].active};
@@ -65,6 +64,8 @@ public:
 
   vtableOpRespT write(unsigned address)
   {
+    BOOST_LOG_TRIVIAL(debug) << "(vtable) performing memory write. (address="
+			     << address << ")";
     auto pageId = pageidFromAddr(address);
     status[pageId].dirty = true;
     return vtableOpRespT{.wasPageFound = status[pageId].active};
@@ -72,12 +73,16 @@ public:
 
   bool full()
   {
-    return pages.size() * KB >= memsz;
+    return pages.size() * pagesz * KB >= memsz * KB;
   }
 
   bool replaceTopPage(unsigned address)
   {
-    bool wasDirty = removeTopPage();
+    bool wasDirty = false;
+    if (!pages.empty()) {
+      auto oldPageId = pages.top().id;
+      wasDirty = removePage(oldPageId);
+    }
     insertNewPage(pageidFromAddr(address));
     return wasDirty;
   }
@@ -105,6 +110,7 @@ private:
 
   unsigned findLowestBits(unsigned pageSize)
   {
+    pageSize *= KB;
     unsigned lowestBits = 0;
     while (pageSize > 1) {
       lowestBits++;
@@ -113,13 +119,11 @@ private:
     return lowestBits;
   }
 
-  bool removeTopPage()
+  bool removePage(unsigned pageId)
   {
-    unsigned topPageId = pages.top().id;
-    pages.pop();
-    bool isDirty = status[topPageId].dirty;
-    status[topPageId].active = false;
-    status[topPageId].dirty = false;
+    bool isDirty = status[pageId].dirty;
+    status[pageId].active = false;
+    status[pageId].dirty = false;
     return isDirty;
   }
 

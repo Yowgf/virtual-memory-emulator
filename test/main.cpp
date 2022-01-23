@@ -9,7 +9,7 @@ namespace logger = boost::log;
 struct Fixture {
   Fixture() {
     logger::core::get()->set_filter(
-       logger::trivial::severity >= LOG_LEVEL
+       logger::trivial::severity >= logger::trivial::debug
     );
   }
   ~Fixture() {}
