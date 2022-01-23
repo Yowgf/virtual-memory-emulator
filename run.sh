@@ -1,1 +1,1 @@
-./build/main.out lru test/fixtures/matriz.log 2 1024
+./build/main.out lru test/fixtures/simulador.log 64 1024

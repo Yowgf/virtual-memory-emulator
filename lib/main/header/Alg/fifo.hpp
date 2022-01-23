@@ -11,12 +11,19 @@
 
 namespace Alg {
 
+struct fifoPageCompare {
+  bool operator()(const Memory::pageT& p1, const Memory::pageT& p2) const {
+    return p1.createdAt < p2.createdAt;
+  }
+};
+
 class fifo : public emulator {
 public:
   fifo(unsigned pageSize, unsigned memorySize, std::string filePath);
   virtual void run();
-  virtual void processRead(unsigned address);
-  virtual void processWrite(unsigned address);
+
+private:
+  Memory::vtable<fifoPageCompare> vtable;
 };
 
 }

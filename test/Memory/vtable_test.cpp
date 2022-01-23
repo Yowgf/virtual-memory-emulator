@@ -47,7 +47,13 @@ BOOST_FIXTURE_TEST_CASE(vtable_empty_not_full, vtablef)
   BOOST_TEST(vtable.full() == false);
 }
 
-BOOST_FIXTURE_TEST_CASE(vtable_full_is_full, vtablef)
+BOOST_FIXTURE_TEST_CASE(vtable_1page_not_full, vtablef)
+{
+  vtable.insertNewPage(0x10000000);
+  BOOST_TEST(vtable.full() == false);
+}
+
+BOOST_FIXTURE_TEST_CASE(vtable_2page_is_full, vtablef)
 {
   vtable.insertNewPage(0x10000000);
   vtable.insertNewPage(0x20000000);

@@ -24,6 +24,7 @@ typedef struct {
   // TODO: make the metrics a union, once I have a better notion of how that
   // should work.
   long int lastUsedAt;
+  long int createdAt;
 } pageT;
 
 typedef struct {
@@ -57,7 +58,7 @@ public:
   vtableOpRespT read(unsigned address)
   {
     BOOST_LOG_TRIVIAL(debug) << "(vtable) performing memory read. (address="
-			     << address << ")";
+			     << address << " pagesz=" << pagesz << ")";
     auto pageId = pageidFromAddr(address);
     return vtableOpRespT{.wasPageFound = status[pageId].active};
   }
@@ -65,7 +66,7 @@ public:
   vtableOpRespT write(unsigned address)
   {
     BOOST_LOG_TRIVIAL(debug) << "(vtable) performing memory write. (address="
-			     << address << ")";
+			     << address << " pagesz=" << pagesz << ")";
     auto pageId = pageidFromAddr(address);
     status[pageId].dirty = true;
     return vtableOpRespT{.wasPageFound = status[pageId].active};
@@ -73,7 +74,26 @@ public:
 
   bool full()
   {
-    return pages.size() * pagesz * KB >= memsz * KB;
+    return pages.size() * pagesz >= memsz;
+  }
+
+  void insertNewPage(unsigned address) {
+    using namespace std::chrono;
+    auto pageId = pageidFromAddr(address);
+    auto currentTime = time_point_cast<nanoseconds>(high_resolution_clock::now()).time_since_epoch().count();
+    BOOST_LOG_TRIVIAL(debug) << "(vtable) inserting new page (address="
+			     << address << " pageid=" << pageId
+			     << " currentTime=" << currentTime << ")";
+
+    pageT newPage{.id = pageId};
+    if (!status[pageId].active) {
+      newPage.createdAt = currentTime;
+    }
+    newPage.lastUsedAt = currentTime;
+
+    pages.push(newPage);
+    status[pageId].active = true;
+    status[pageId].dirty = false;
   }
 
   bool replaceTopPage(unsigned address)
@@ -85,18 +105,6 @@ public:
     }
     insertNewPage(pageidFromAddr(address));
     return wasDirty;
-  }
-
-  void insertNewPage(unsigned address) {
-    using namespace std::chrono;
-    auto pageId = pageidFromAddr(address);
-    auto currentTime = time_point_cast<nanoseconds>(high_resolution_clock::now()).time_since_epoch().count();
-    BOOST_LOG_TRIVIAL(debug) << "(vtable) inserting new page (address="
-			     << address << " pageid=" << pageId
-			     << " currentTime=" << currentTime << ")";
-    pages.push(pageT{.id = pageId, .lastUsedAt = currentTime});
-    status[pageId].active = true;
-    status[pageId].dirty = false;
   }
 
 private:
@@ -121,6 +129,8 @@ private:
 
   bool removePage(unsigned pageId)
   {
+    BOOST_LOG_TRIVIAL(debug) << "(vtable) removing page (pageId="
+			     << pageId << ")";
     bool isDirty = status[pageId].dirty;
     status[pageId].active = false;
     status[pageId].dirty = false;

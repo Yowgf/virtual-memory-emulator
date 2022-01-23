@@ -37,17 +37,8 @@ void emulator::decodeFile(std::string filePath)
 	    file.good(), file.eof(), file.fail(), file.bad());
     throw std::runtime_error(buffer);
   }
-}
-
-void emulator::processOperations(memopsT& memops)
-{
-  for (auto it = memops.begin(); it != memops.end(); it++) {
-    if (it->type == READ_OP) {
-      processRead(it->address);
-    } else {
-      processWrite(it->address);
-    }
-  }
+  BOOST_LOG_TRIVIAL(info) << "Read " << memops.size() << " memory operations "
+			  << "from input file";
 }
 
 void emulator::logStats()

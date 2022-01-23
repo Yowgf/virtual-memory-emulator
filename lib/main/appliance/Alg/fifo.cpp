@@ -9,16 +9,17 @@
 
 namespace Alg {
 
-fifo::fifo(unsigned pageSize, unsigned memorySize, std::string filePath)
-{}
+fifo::fifo(unsigned pageSize, unsigned memorySize, std::string filePath) :
+  vtable(pageSize, memorySize)
+{
+  BOOST_LOG_TRIVIAL(info) << "(fifo) initializing fifo (pageSize="
+			  << pageSize << " memorySize=" << memorySize << ")";
+  configure(filePath);
+}
 
 void fifo::run()
-{}
-
-void fifo::processRead(unsigned address)
-{}
-
-void fifo::processWrite(unsigned address)
-{}
+{
+  processOperations<fifoPageCompare>(memops, vtable);
+}
 
 }
