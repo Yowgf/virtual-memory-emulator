@@ -7,8 +7,8 @@
 
 # Compiler command and flags
 CXX   := 
-COMPILE_FLAGS := -std=c++14 -Wall -DBOOST_LOG_DYN_LINK
-LINKING_FLAGS := -std=c++14 -Wall -lboost_log -lpthread
+COMPILE_FLAGS := -std=c++14 -Wall -O3 -DBOOST_LOG_DYN_LINK
+LINKING_FLAGS := -std=c++14 -Wall -O3 -lboost_log -lpthread
 
 # Source directory
 SOURCE := lib

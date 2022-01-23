@@ -44,10 +44,14 @@ void emulator::decodeFile(std::string filePath)
 			  << "from input file";
 }
 
-void emulator::logStats()
+void emulator::logStats(bool isTestMode)
 {
-  std::cout << "Page faults: " << stats.numPageFaults << "\n";
-  std::cout << "Page writebacks: " << stats.numPageWrites << "\n";
+  if (isTestMode) {
+    std::cout << stats.numPageFaults << ' ' << stats.numPageWrites << ' ';
+  } else {
+    std::cout << "Page faults: " << stats.numPageFaults << "\n";
+    std::cout << "Page writebacks: " << stats.numPageWrites << "\n";
+  }
 }
 
 }

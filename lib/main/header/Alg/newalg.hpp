@@ -10,8 +10,6 @@
 #include "Alg/emulator.hpp"
 #include "Utils/defs.hpp"
 
-#include <cmath>
-
 namespace Alg {
 
 struct newalgPageCompare {

@@ -7,7 +7,7 @@
 // replacement functionality for a virtual memory system. The actual policy by
 // which pages are chosen to be replaced is delegated to the classes that
 // inherit from 'emulator', such as 'lru' and 'fifo'.
-// ===----------------------------------------------------------------------===//
+//===----------------------------------------------------------------------===//
 
 #ifndef ALG_EMULATOR_H
 #define ALG_EMULATOR_H
@@ -75,7 +75,7 @@ public:
     }
   }
 
-  void logStats();
+  void logStats(bool isTestMode);
 
 protected:
   unsigned pageSize;

@@ -37,11 +37,13 @@ public:
 private:
   // Constraints
   static constexpr int minArgcAllowed = 5;
-  static constexpr int maxArgcAllowed = 5;
+  static constexpr int maxArgcAllowed = 6;
   static constexpr unsigned maxFileNameLen = 0x100;
   const std::vector<std::string> allowedEmulators{"lru", "fifo", "newalg"};
 
   inputT userInput;
+
+  bool isTestMode;
 
   void destroy();
 

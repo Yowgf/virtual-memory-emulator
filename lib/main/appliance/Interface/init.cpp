@@ -23,19 +23,22 @@ namespace logger = boost::log;
 
 namespace Interface {
   
-init::init(int argc, char** argv)
+init::init(int argc, char** argv) : isTestMode(false)
 {
   const bool areValid = validateArguments(argc, argv);
   if (!areValid) {
     throw std::invalid_argument {"Invalid program arguments"\
                                    "\nUsage: <program> <emulator>"\
-                                   " <input-file> <page-size> <memory-size>"};
+                                   " <input-file> <page-size> <memory-size>"\
+				   " [<test-mode>]"};
   }
 
   try {
     initLogger();
     userInput = processEntries(argc, argv);
-    printHeader();
+    if (!isTestMode) {
+      printHeader();
+    }
     auto executionTime = timeRunAlg(this->userInput.chosenEmulator);
     printFooter(executionTime);
   }
@@ -114,6 +117,10 @@ inputT init::processEntries(int argc, char** argv)
   std::stringstream ss;
   ss << argv[3]; ss >> pageSize; ss.clear();
   ss << argv[4]; ss >> memorySize; ss.clear();
+
+  if (argc == maxArgcAllowed && std::string(argv[5]) == "test") {
+    isTestMode = true;
+  }
   
   auto* emulator = chooseAlg(emulatorStr, pageSize, memorySize, filePath);
 
@@ -150,7 +157,7 @@ void init::printHeader()
 
 void init::printFooter(clockT executionTime)
 {
-  userInput.chosenEmulator->logStats();
+  userInput.chosenEmulator->logStats(isTestMode);
 #ifdef PRINT_EXECUTION_TIME
   printExecTime(executionTime);
 #endif
@@ -159,7 +166,11 @@ void init::printFooter(clockT executionTime)
 void init::printExecTime(clockT executionTime)
 {
   double clkCount = executionTime.count();
-  std::cout << "Execution time (seconds): " << std::setprecision(6) << std::fixed << clkCount << "\n";
+  if (isTestMode) {
+    std::cout << std::setprecision(6) << std::fixed << clkCount << '\n';
+  } else {
+    std::cout << "Execution time (seconds): " << std::setprecision(6) << std::fixed << clkCount << "\n";
+  }
 }
 
 }

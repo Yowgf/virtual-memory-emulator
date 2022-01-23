@@ -20,6 +20,6 @@
 #include <boost/log/trivial.hpp>
 #include <boost/log/expressions.hpp>
 
-#define LOG_LEVEL boost::log::trivial::info
+#define LOG_LEVEL boost::log::trivial::error
 
 #endif // #ifndef DEFS_H
