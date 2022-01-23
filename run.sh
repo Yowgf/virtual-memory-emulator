@@ -1,1 +1,1 @@
-./build/main.out lru test/fixtures/simulador.log 64 1024
+./build/main.out fifo test/fixtures/simulador.log 2 16384

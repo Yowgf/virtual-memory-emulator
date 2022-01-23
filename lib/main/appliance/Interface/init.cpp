@@ -13,7 +13,6 @@
 #include "Utils/file.hpp"
 #include "Utils/error.hpp"
 
-#include <cstdlib>
 #include <iomanip>
 #include <iostream>
 #include <string>
@@ -42,8 +41,6 @@ init::init(int argc, char** argv)
     printFooter(executionTime);
   }
   catch(std::exception&) {
-    // TODO: remove this memory leak
-    free(this->userInput.chosenEmulator);
     destroy();
     throw;
   }
@@ -54,8 +51,18 @@ init::~init()
   destroy();
 }
 
+#pragma GCC diagnostic ignored "-Wdelete-non-virtual-dtor"
 void init::destroy()
-{}
+{
+  auto emulatorStr = userInput.chosenEmulatorStr;
+  if (emulatorStr == "lru") {
+    delete reinterpret_cast<Alg::lru*>(this->userInput.chosenEmulator);
+  } else if (emulatorStr == "fifo") {
+    delete reinterpret_cast<Alg::fifo*>(this->userInput.chosenEmulator);
+  } else if (emulatorStr == "newalg") {
+    delete reinterpret_cast<Alg::newalg*>(this->userInput.chosenEmulator);
+  }
+}
 
 void init::initLogger()
 {
@@ -111,7 +118,9 @@ inputT init::processEntries(int argc, char** argv)
   
   auto* emulator = chooseAlg(emulatorStr, pageSize, memorySize, filePath);
 
-  return inputT{emulatorStr, filePath, pageSize, memorySize, emulator};
+  inputT input{emulatorStr, filePath, pageSize, memorySize, emulator};
+
+  return input;
 }
 
 Alg::emulator* init::chooseAlg

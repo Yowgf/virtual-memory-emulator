@@ -14,6 +14,9 @@
 
 namespace Alg {
 
+emulator::emulator() : pageSize(0), memorySize(0), stats(statsT{0, 0})
+{}
+
 void emulator::configure(std::string filePath)
 {
   decodeFile(filePath);
@@ -22,12 +25,12 @@ void emulator::configure(std::string filePath)
 void emulator::decodeFile(std::string filePath)
 {
   auto file = std::ifstream{filePath, std::ifstream::in};
-  unsigned i = 0;
   while (file.good()) {
     auto op = memopT{};
     file >> std::hex >> op.address >> op.type;
-    memops.push_back(op);
-    i++;
+    if (!file.eof()) {
+      memops.push_back(op);
+    }
   }
   // Something went wrong while reading file
   if (!file.eof()) {

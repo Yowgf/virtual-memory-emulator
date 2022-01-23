@@ -21,8 +21,7 @@ constexpr unsigned KB = 1024;
 
 typedef struct {
   unsigned id;
-  // TODO: make the metrics a union, once I have a better notion of how that
-  // should work.
+  // TODO: make the metrics a union
   long int lastUsedAt;
   long int createdAt;
 } pageT;
@@ -101,6 +100,7 @@ public:
     bool wasDirty = false;
     if (!pages.empty()) {
       auto oldPageId = pages.top().id;
+      pages.pop();
       wasDirty = removePage(oldPageId);
     }
     insertNewPage(pageidFromAddr(address));

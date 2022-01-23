@@ -11,10 +11,20 @@
 
 namespace Alg {
 
+struct newalgPageCompare {
+  bool operator()(const Memory::pageT& p1, const Memory::pageT& p2) const {
+    return true;
+  }
+};
+
 class newalg : public emulator {
 public:
-  newalg(unsigned pageSize, unsigned memorySize, std::string filePath);
+  explicit newalg(unsigned pageSize, unsigned memorySize, std::string filePath);
+  ~newalg() = default;
   virtual void run();
+
+private:
+  Memory::vtable<newalgPageCompare> vtable;
 };
 
 }

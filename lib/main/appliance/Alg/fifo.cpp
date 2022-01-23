@@ -10,7 +10,7 @@
 namespace Alg {
 
 fifo::fifo(unsigned pageSize, unsigned memorySize, std::string filePath) :
-  vtable(pageSize, memorySize)
+  emulator(), vtable(pageSize, memorySize)
 {
   BOOST_LOG_TRIVIAL(info) << "(fifo) initializing fifo (pageSize="
 			  << pageSize << " memorySize=" << memorySize << ")";

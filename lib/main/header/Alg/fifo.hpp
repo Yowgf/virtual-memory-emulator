@@ -13,13 +13,15 @@ namespace Alg {
 
 struct fifoPageCompare {
   bool operator()(const Memory::pageT& p1, const Memory::pageT& p2) const {
-    return p1.createdAt < p2.createdAt;
+    // We want the page with minimum createdAt
+    return p1.createdAt > p2.createdAt;
   }
 };
 
 class fifo : public emulator {
 public:
-  fifo(unsigned pageSize, unsigned memorySize, std::string filePath);
+  explicit fifo(unsigned pageSize, unsigned memorySize, std::string filePath);
+  ~fifo() = default;
   virtual void run();
 
 private:

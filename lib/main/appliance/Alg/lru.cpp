@@ -11,7 +11,7 @@
 namespace Alg {
 
 lru::lru(unsigned pageSize, unsigned memorySize, std::string filePath) :
-  vtable(pageSize, memorySize)
+  emulator(), vtable(pageSize, memorySize)
 {
   BOOST_LOG_TRIVIAL(info) << "(lru) initializing lru (pageSize="
 			  << pageSize << " memorySize=" << memorySize << ")";

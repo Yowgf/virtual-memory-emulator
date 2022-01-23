@@ -13,6 +13,7 @@
 #include "Alg/emulator.hpp"
 #include "Utils/time.hpp"
 
+#include <memory>
 #include <string>
 #include <vector>
 

@@ -34,6 +34,8 @@ typedef struct {
 
 class emulator {
 public:
+  explicit emulator();
+
   void configure(std::string filePath);
 
   virtual void run() = 0;
