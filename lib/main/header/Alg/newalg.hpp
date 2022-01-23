@@ -8,12 +8,16 @@
 #define ALG_NEWALG_H
 
 #include "Alg/emulator.hpp"
+#include "Utils/defs.hpp"
+
+#include <cmath>
 
 namespace Alg {
 
 struct newalgPageCompare {
   bool operator()(const Memory::pageT& p1, const Memory::pageT& p2) const {
-    return true;
+    // We want page with minimum historyUses to be replaced
+    return p1.historyUses > p2.historyUses;
   }
 };
 

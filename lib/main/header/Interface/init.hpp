@@ -4,7 +4,7 @@
 // File purpose: init class header
 //
 // Description: this class validates user argument and gets it ready
-// to be run on the target algorithm
+// to be run on the target algorithm.
 //===----------------------------------------------------------===//
 
 #ifndef INIT_H
@@ -13,12 +13,12 @@
 #include "Alg/emulator.hpp"
 #include "Utils/time.hpp"
 
-#include <memory>
 #include <string>
 #include <vector>
 
 namespace Interface {
 
+// User input we expect (command line)
 typedef struct {
   std::string chosenEmulatorStr;
   std::string filePath;
@@ -47,15 +47,15 @@ private:
 
   void initLogger();
 
+  bool validateArguments(int argc, char** argv) const noexcept;
   inputT processEntries(int argc, char** argv);
   Alg::emulator* chooseAlg
     (std::string emulatorStr,
      unsigned pageSize,
      unsigned memorySize,
      std::string filePath);
-  bool validateArguments(int argc, char** argv) const noexcept;
-
   clockT timeRunAlg(Alg::emulator* alg);
+
   void printHeader();
   void printFooter(clockT executionTime);
   void printExecTime(clockT executionTime);

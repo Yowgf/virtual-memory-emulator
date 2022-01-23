@@ -1,8 +1,9 @@
-//===----------------------------------------------------------===//
+//===----------------------------------------------------------------------===//
 // Alg module
 //
-// File purpose: ~lru~ class declaration.
-//===----------------------------------------------------------===//
+// File purpose: ~lru~ class declaration. LRU stands for the Least Recently Used
+// page replacement policy.
+//===----------------------------------------------------------------------===//
 
 #ifndef ALG_LRU_H
 #define ALG_LRU_H
@@ -13,7 +14,7 @@ namespace Alg {
 
 struct lruPageCompare {
   bool operator()(const Memory::pageT& p1, const Memory::pageT& p2) const {
-    // We want the page with minimum lastUsedAt
+    // We want the page with minimum lastUsedAt to be removed
     return p1.lastUsedAt > p2.lastUsedAt;
   }
 };

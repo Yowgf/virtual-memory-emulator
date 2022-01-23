@@ -11,7 +11,6 @@
 #include "Interface/init.hpp"
 #include "Utils/defs.hpp"
 #include "Utils/file.hpp"
-#include "Utils/error.hpp"
 
 #include <iomanip>
 #include <iostream>

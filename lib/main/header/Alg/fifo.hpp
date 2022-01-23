@@ -1,8 +1,9 @@
-//===----------------------------------------------------------===//
+//===----------------------------------------------------------------------===//
 // Alg module
 //
-// File purpose: ~fifo~ class declaration.
-//===----------------------------------------------------------===//
+// File purpose: ~fifo~ class declaration. FIFO stands for the First In First
+// Out page replacement policy.
+//===----------------------------------------------------------------------===//
 
 #ifndef ALG_FIFO_H
 #define ALG_FIFO_H
@@ -13,7 +14,7 @@ namespace Alg {
 
 struct fifoPageCompare {
   bool operator()(const Memory::pageT& p1, const Memory::pageT& p2) const {
-    // We want the page with minimum createdAt
+    // We want the page with minimum createdAt to be replaced
     return p1.createdAt > p2.createdAt;
   }
 };

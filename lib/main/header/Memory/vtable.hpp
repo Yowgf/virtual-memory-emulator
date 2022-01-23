@@ -20,15 +20,26 @@ namespace Memory {
 constexpr unsigned KB = 1024;
 
 typedef struct {
+  // TODO: remove this field
   unsigned id;
   // TODO: make the metrics a union
+
+  // Last time page was used (either a read or write) in nanoseconds
   long int lastUsedAt;
+  // Time of creation of the page in nanoseconds
   long int createdAt;
+  // Number of times page was used last time it was it memory. This needs to be
+  // kept here and in the status vector. The reason is:
+  //
+  // - It needs to be here to order the heap
+  // - It needs to be in the status vector so that we can quickly access it
+  unsigned historyUses;
 } pageT;
 
 typedef struct {
   bool active;
   bool dirty;
+  unsigned historyUses;
 } pageStatusT;
 
 typedef struct {
@@ -51,7 +62,11 @@ public:
     }
     lowestBits = findLowestBits(this->pagesz);
     unsigned numPages = std::numeric_limits<unsigned>::max() >> lowestBits;
-    status = std::vector<pageStatusT>{numPages, pageStatusT{.active=false, .dirty=false}};
+    status = std::vector<pageStatusT>
+      {
+        numPages,
+	pageStatusT{.active=false, .dirty=false, .historyUses=0}
+      };
   }
 
   vtableOpRespT read(unsigned address)
@@ -59,6 +74,7 @@ public:
     BOOST_LOG_TRIVIAL(debug) << "(vtable) performing memory read. (address="
 			     << address << " pagesz=" << pagesz << ")";
     auto pageId = pageidFromAddr(address);
+    status[pageId].historyUses++;
     return vtableOpRespT{.wasPageFound = status[pageId].active};
   }
 
@@ -67,8 +83,12 @@ public:
     BOOST_LOG_TRIVIAL(debug) << "(vtable) performing memory write. (address="
 			     << address << " pagesz=" << pagesz << ")";
     auto pageId = pageidFromAddr(address);
-    status[pageId].dirty = true;
-    return vtableOpRespT{.wasPageFound = status[pageId].active};
+    status[pageId].historyUses++;
+    bool wasFound = status[pageId].active;
+    if (wasFound) {
+      status[pageId].dirty = true;
+    }
+    return vtableOpRespT{.wasPageFound = wasFound};
   }
 
   bool full()
@@ -77,9 +97,8 @@ public:
   }
 
   void insertNewPage(unsigned address) {
-    using namespace std::chrono;
     auto pageId = pageidFromAddr(address);
-    auto currentTime = time_point_cast<nanoseconds>(high_resolution_clock::now()).time_since_epoch().count();
+    auto currentTime = Utils::time::now_nanoseconds();
     BOOST_LOG_TRIVIAL(debug) << "(vtable) inserting new page (address="
 			     << address << " pageid=" << pageId
 			     << " currentTime=" << currentTime << ")";
@@ -87,6 +106,8 @@ public:
     pageT newPage{.id = pageId};
     if (!status[pageId].active) {
       newPage.createdAt = currentTime;
+      newPage.historyUses = status[pageId].historyUses;
+      status[pageId].historyUses = 0;
     }
     newPage.lastUsedAt = currentTime;
 
@@ -110,7 +131,6 @@ public:
 private:
   unsigned pagesz;
   unsigned memsz;
-
   unsigned lowestBits;
 
   pagesT pages;
@@ -127,6 +147,11 @@ private:
     return lowestBits;
   }
 
+  unsigned pageidFromAddr(unsigned address)
+  {
+    return address >> lowestBits;
+  }
+
   bool removePage(unsigned pageId)
   {
     BOOST_LOG_TRIVIAL(debug) << "(vtable) removing page (pageId="
@@ -135,11 +160,6 @@ private:
     status[pageId].active = false;
     status[pageId].dirty = false;
     return isDirty;
-  }
-
-  unsigned pageidFromAddr(unsigned address)
-  {
-    return address >> lowestBits;
   }
 };
 

@@ -8,6 +8,8 @@
 #ifndef TIME_H
 #define TIME_H
 
+#include "Utils/defs.hpp"
+
 #include <chrono>
 
 #ifdef MEASURE_TIME
@@ -26,8 +28,14 @@ typedef std::chrono::duration<double> clockT;
 namespace Utils {
 
 class time {
+public:
+  static long int now_nanoseconds()
+  {
+    return std::chrono::time_point_cast<std::chrono::nanoseconds>
+      (std::chrono::high_resolution_clock::now()).time_since_epoch().count();
+  }
 };
 
 }
 
-#endif
+#endif // #ifdef TIME_H
