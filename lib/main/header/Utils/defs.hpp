@@ -13,7 +13,7 @@
 // Global types
 
 // Debugging control macros
-#define PRINT_EXECUTION_TIME
+// #define PRINT_EXECUTION_TIME
 
 // Global variables
 #include <boost/log/core.hpp>

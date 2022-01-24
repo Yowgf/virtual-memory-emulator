@@ -20,8 +20,8 @@ namespace Memory {
 constexpr unsigned KB = 1024;
 
 typedef struct {
-  // TODO: remove this field
   unsigned id;
+
   // TODO: make the metrics a union
 
   // Last time page was used (either a read or write) in nanoseconds
